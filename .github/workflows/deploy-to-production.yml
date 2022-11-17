@@ -1,0 +1,30 @@
+name: Source and target branch validation
+on:
+  pull_request:
+    branches: [develop, staging, main]
+    types: [opened, reopened, synchronize, edited]
+
+jobs:
+  branch_validate:
+    runs-on: ubuntu-latest
+    steps:
+      # single project validation
+      - if: ${{ ( github.base_ref == 'pre-devlop' && github.head_ref == 'develop' && github.head_ref != 'staging'  && ( startsWith(github.head_ref, 'add/') && startsWith(github.head_ref, 'update/') && startsWith(github.head_ref, 'fix/')) )}}
+        run: |
+          echo "${{github.base_ref}} branch cannot be merged with ${{github.head_ref}}. Please change the base branch name to 'develop' "
+          exit 1
+          
+      - if: ${{ ( github.base_ref == 'develop' && ( !startsWith(github.head_ref, 'add/') && !startsWith(github.head_ref, 'update/') && !startsWith(github.head_ref, 'fix/')) )}}
+        run: |
+          echo "Source branch cannot be merged with current branch"
+          exit 1
+
+      - if: ${{ ( github.base_ref == 'staging' && github.head_ref != 'develop' )}}
+        run: |
+          echo "Source branch cannot be merged with current branch"
+          exit 1
+
+      - if: ${{ ((( github.base_ref == 'main' || github.base_ref == 'master') && github.head_ref != 'staging' )) }}
+        run: |
+          echo "Source branch cannot be merged with current branch"
+          exit 1
