@@ -3,7 +3,6 @@ on:
   pull_request:
     branches: [develop, staging, main]
     types: [opened, reopened, synchronize, edited]
-
 jobs:
   branch_validate:
     runs-on: ubuntu-latest
